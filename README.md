@@ -1,134 +1,95 @@
 # SaaS Customer Churn & Usage Analysis
 
-A SQL Server + Power BI portfolio project analyzing customer churn, product engagement, support activity, subscription behavior, and churn reasons for a SaaS business.
+A SQL Server + Power BI portfolio project exploring customer churn, product engagement, support activity, subscription behavior, and churn reasons for a SaaS business.
 
 ## Business Objective
 
-Identify the customer behaviors most strongly associated with churn and translate those findings into practical retention actions.
+Identify behaviors associated with churn and translate the findings into practical retention actions.
 
 ## Tools
 
-- SQL Server / SSMS
+- SQL Server / SQL Server Management Studio
 - Power BI
+- DAX
 - GitHub
 
 ## Dataset
 
-The project uses five related SaaS datasets:
+The analysis uses five related datasets: Accounts, Subscriptions, Feature Usage, Support Tickets, and Churn Events.
 
-- Accounts
-- Subscriptions
-- Feature Usage
-- Support Tickets
-- Churn Events
+## SQL Analysis
 
-## Analysis Approach
+The SQL scripts cover data-quality checks, churn patterns, feature usage, support activity, and business insights. They are available in [SQL](SQL/).
 
-1. Validate data quality and referential integrity.
-2. Analyze churn by plan tier and churn reason.
-3. Aggregate product usage at the customer level.
-4. Compare engagement between active and churned customers.
-5. Analyze feature-level engagement gaps and error rates.
-6. Evaluate support-ticket volume and satisfaction completeness.
-7. Translate findings into retention recommendations.
+## Power BI Dashboard
 
-## Key Findings
+The current report includes:
+- KPI cards for total accounts, churned accounts, and account-level churn rate
+- Churn rate by plan tier
+- Churn events by reason
+- Average product usage by customer status
+- Slicers for plan tier and billing frequency
 
-### Product engagement is the strongest signal
+The PBIX file and a full-resolution screenshot should be added to the PowerBI and Screenshots folders.
 
-Average product usage was approximately:
+## Key SQL Findings
+
+### Product engagement is a strong churn signal
+
+In the subscription-status usage analysis, average usage was approximately:
 
 | Status | Average Usage |
 |---|---:|
 | Active | 453.44 |
 | Churned | 76.30 |
 
-That is roughly a **5.9x difference**.
-
-Exploratory usage bands showed a sharp change around 200 usage events:
-
-| Usage Band | Churn Rate |
-|---|---:|
-| 0-49 | 100.00% |
-| 50-99 | 98.46% |
-| 100-149 | 84.93% |
-| 150-199 | 51.22% |
-| 200-299 | 4.76% |
-| 300-399 | 0.00% |
-| 400-499 | 0.00% |
-| 500+ | 0.00% |
-
-These thresholds are **dataset-specific exploratory signals**, not causal or universal benchmarks.
+This is roughly a 5.9x difference. Exploratory usage bands also showed much higher churn among low-usage groups. These are associations in this dataset, not proof that low usage causes churn.
 
 ### Plan tier is a weaker differentiator
 
-Observed churn rates:
-
+Observed SQL churn rates were approximately:
 - Enterprise: 30.48%
 - Pro: 29.75%
 - Basic: 27.50%
 
-The relatively small spread suggests that engagement may be more actionable for retention than plan tier alone.
-
 ### Churn reasons vary by plan
 
-The leading reason differed by plan:
-
-- Basic: Budget
-- Enterprise: Support
-- Pro: Features
+- Basic: Budget was the leading reason
+- Enterprise: Support was the leading reason
+- Pro: Features was the leading reason
 
 Overall, Features was the largest churn reason by event count and refund impact.
 
 ### Support activity is a weaker signal
 
-Among accounts represented in the support-ticket analysis:
+Among accounts represented in the support-ticket analysis, churned customers averaged about 4.07 tickets per account versus 3.89 for active customers.
 
-- Churned: ~4.07 tickets/account
-- Active: ~3.89 tickets/account
+## Important Metric Definitions
 
-The difference is small compared with the product-usage signal.
+The Power BI overview currently uses the churn_flag in ravenstack_accounts for its headline account-level KPI: 110 flagged accounts out of 500 (22%). Some SQL analyses use churn_flag in ravenstack_subscriptions and therefore measure subscription lifecycle status at a different grain. These figures are not directly comparable until the project defines and applies one consistent customer-status rule across visuals.
 
-## Business Recommendations
-
-1. Build a low-engagement early-warning segment.
-2. Improve onboarding and product adoption.
-3. Track activation milestones and time-to-value.
-4. Tailor retention interventions to plan-specific churn reasons.
-5. Validate engagement thresholds on future customer cohorts.
+Churn events are historical churn-related activity and should not automatically be interpreted as subscription cancellations. Subscription data contains multiple lifecycle records per account. The analysis identifies associations, not causation.
 
 ## Data Quality & Limitations
 
-- Subscription data contains multiple lifecycle records per account, so analysis must respect data grain.
-- Churn events represent historical churn-related activity and should not automatically be treated as subscription cancellations.
+- Subscription data contains multiple lifecycle records per account; preserve the correct grain in joins and aggregations.
+- Feature usage connects to subscriptions through subscription_id.
 - 825 of 2,000 support tickets have no satisfaction score (41.25%); missing values should remain NULL.
-- The analysis identifies associations, not causation.
+- Churn events do not always match subscription cancellation flags.
+- Exploratory usage thresholds should be validated on future customer cohorts.
 
 ## Repository Structure
 
-```
-SaaS-Customer-Churn-Analysis/
-├── README.md
-├── SQL/
-│   ├── 01_Data_Quality_Audit.sql
-│   ├── 02_Churn_Analysis.sql
-│   ├── 03_Feature_Usage_Analysis.sql
-│   ├── 04_Support_Analysis.sql
-│   └── 05_Business_Insights.sql
-├── PowerBI/
-│   └── README.md
-├── Screenshots/
-│   └── README.md
-└── Documentation/
-    └── Business_Insights.md
-```
+- README.md
+- SQL/ (five analysis scripts)
+- PowerBI/ (dashboard file and instructions)
+- Screenshots/ (dashboard screenshot)
+- Documentation/ (business insights)
 
 ## Project Status
 
-**SQL analysis and documentation:** Complete  
-**Power BI dashboard:** Next  
-**Final dashboard screenshot:** Next
+- SQL analysis and business insights: complete
+- Power BI dashboard: created; final metric reconciliation and visual polish remain
+- GitHub binary dashboard and screenshot upload: pending
 
 ---
-
-This project is designed as a portfolio case study demonstrating SQL analysis, data-quality validation, customer segmentation, business interpretation, and dashboard planning.
