@@ -1,57 +1,53 @@
 # Business Insights
 
-## Executive finding
+## Executive summary
 
-Product engagement is the strongest signal identified in this dataset. Churned customers show substantially lower product usage than active customers.
+The project currently reports account-level churn separately from subscription lifecycle churn. These measures use different grains and should not be combined into one headline conclusion. The validated account-level churn rate is 22% (110 of 500 accounts).
 
-## Key findings
+## Validated account-level product usage
 
-### Product usage and churn
-Average usage was approximately 453.44 for active customers versus 76.30 for churned customers, a difference of roughly 5.9x.
+Usage was aggregated across each account's subscriptions, then grouped using `ravenstack_accounts[churn_flag]`. Accounts without matching feature-usage records are excluded from this comparison.
 
-Exploratory usage bands showed a sharp change around 200 usage:
-- 0-49: 100.00% churn
-- 50-99: 98.46%
-- 100-149: 84.93%
-- 150-199: 51.22%
-- 200-299: 4.76%
-- 300-399: 0.00%
-- 400-499: 0.00%
-- 500+: 0.00%
+| Account status | Accounts with usage | Total usage | Average usage per account |
+|---|---:|---:|---:|
+| Active | 390 | 193,101 | 495.13 |
+| Churned | 110 | 57,424 | 522.04 |
+| Overall | 500 | 250,525 | 501.05 |
 
-These thresholds are exploratory and should be validated on future cohorts.
+In this account-level comparison, flagged churned accounts have approximately 5.4% higher average usage than active accounts. This does **not** support the earlier claim that churned customers use the product substantially less. It is an association in this dataset, not evidence of causation.
 
-### Plan tier
-Observed churn rates were approximately:
-- Enterprise: 30.48%
-- Pro: 29.75%
-- Basic: 27.50%
+## Subscription-level plan analysis
 
-The spread is modest compared with the engagement difference.
+An earlier SQL analysis reported these plan-level subscription-status rates:
 
-### Churn reasons
-The leading reason differed by plan:
-- Basic: Budget
-- Enterprise: Support
-- Pro: Features
+- Enterprise: approximately 30.48%
+- Pro: approximately 29.75%
+- Basic: approximately 27.50%
 
-Overall, Features was the largest churn reason by event count and refund impact.
+These are subscription-table results and should not be presented as account-level churn rates unless the plan assignment and account-level status logic are standardized. The spread is modest, but the metric definition must be clearly labeled.
 
-### Support
-Among accounts represented in the ticket analysis, churned customers averaged about 4.07 tickets per account versus 3.89 for active customers. The difference is small.
+## Churn reasons
+
+Churn-event records describe historical churn-related activity. Earlier analysis found that the leading recorded reason varied by plan (Basic: Budget; Enterprise: Support; Pro: Features) and that Features was a leading overall reason by event count. These results should be validated for duplicate event rows before being presented as unique customer cancellations.
+
+Refund amounts represent recorded refund impact, not necessarily total revenue lost.
+
+## Support activity
+
+An earlier analysis found only a small difference in average ticket counts between groups classified using subscription-derived status. Recalculate this comparison using the account-level churn definition before using it as an account-level conclusion.
 
 ## Recommendations
 
-1. Flag persistently low-engagement customers as an early-warning segment.
-2. Improve onboarding and feature adoption.
-3. Track activation milestones and time-to-value.
-4. Tailor retention messaging by plan and churn reason.
-5. Validate usage thresholds on new customer cohorts before operationalizing them.
+1. Keep account-level KPIs anchored to `ravenstack_accounts[churn_flag]`.
+2. Label subscription lifecycle metrics explicitly as subscription-level.
+3. Define a single plan assignment rule per account before reporting account churn by plan.
+4. Count churn events at event grain and avoid joins that multiply event rows.
+5. Investigate customer behavior with cohort and time-based analysis before making causal claims.
 
 ## Data limitations
 
-- The subscriptions table contains multiple lifecycle records per account.
-- Churn events are historical churn-related events and are not automatically equivalent to subscription cancellation.
-- Support satisfaction is missing for 825 of 2,000 tickets (41.25%).
-- Missing satisfaction values should remain NULL rather than being imputed as zero.
-- The analysis identifies associations, not causation.
+- The subscriptions table contains multiple lifecycle records per account, and 312 accounts have mixed subscription status flags.
+- Account-level and subscription-level churn flags disagree for many accounts; they are not interchangeable.
+- Churn events are not automatically equivalent to subscription cancellations.
+- Support satisfaction is missing for 825 of 2,000 tickets (41.25%); preserve missing values as NULL.
+- Results are observational and should not be interpreted as causal evidence.
