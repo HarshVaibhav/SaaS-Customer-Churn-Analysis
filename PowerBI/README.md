@@ -12,22 +12,26 @@
 - Average product usage by customer status
 - Slicers for plan tier and billing frequency
 
-## Metric Definitions
+## Validated Account-Level Metrics
 
-### Account-level KPIs
+Use `ravenstack_accounts[churn_flag]` for account-level totals and churn rate: 110 flagged accounts out of 500 (22%).
 
-Use `ravenstack_accounts[churn_flag]` for account-level totals and churn rate. Current source counts are 110 flagged accounts out of 500 (22%).
+The account-level usage benchmark (accounts without usage excluded) is:
 
-### Subscription-level analysis
+| Account status | Accounts with usage | Total usage | Average usage per account |
+|---|---:|---:|---:|
+| Active | 390 | 193,101 | 495.13 |
+| Churned | 110 | 57,424 | 522.04 |
+| Overall | 500 | 250,525 | 501.05 |
 
-`ravenstack_subscriptions[churn_flag]` represents subscription lifecycle status. Since an account can have multiple subscription records, subscription-level results may differ from account-level KPIs. Label subscription-level visuals accordingly and do not compare their denominators directly with the account KPI.
+The usage measure should aggregate usage across subscriptions per account and group accounts using the account table's churn flag. Do not infer that lower usage causes churn from these results.
 
-### Visuals requiring validation
+## Remaining Metric Checks
 
-1. **Churn by plan tier:** confirm whether the visual measures churned accounts or churned subscriptions. If reporting account churn by plan, define a single plan assignment per account (for example, the latest subscription by start date) and use the account-level churn flag.
-2. **Usage by customer status:** aggregate usage to the account level and group accounts using `ravenstack_accounts[churn_flag]`. Avoid grouping the same account into both subscription status categories.
-3. **Churn events by reason:** count rows from the Churn Events table at event grain. Joining directly to Subscriptions by `account_id` can duplicate events when an account has multiple subscription records.
-4. **Slicers:** confirm plan and billing slicers filter only visuals for which those dimensions have a defined relationship and meaning.
+1. **Churn by plan tier:** confirm whether the visual measures churned accounts or churned subscriptions. For account-level churn by plan, define a single plan assignment per account (for example, latest subscription by start date) and use the account-level churn flag.
+2. **Churn events by reason:** count rows from the Churn Events table at event grain. Joining directly to Subscriptions by `account_id` can duplicate events when an account has multiple subscription records.
+3. **Slicers:** confirm plan and billing slicers filter only visuals for which those dimensions have a defined relationship and meaning.
+4. **Visual validation:** clear slicers and compare values against the SQL benchmarks above.
 
 ## Model Relationships
 
@@ -40,9 +44,9 @@ Keep single-direction filtering where practical and avoid joins that duplicate c
 
 ## Final Validation Checklist
 
-- [ ] Reconcile account-level and subscription-level churn definitions.
-- [ ] Confirm usage is aggregated per account and status comes from Accounts.
+- [x] Validate account-level churn KPI.
+- [x] Validate account-level usage aggregation against SQL.
 - [ ] Verify plan-level status and the plan assignment rule.
 - [ ] Ensure churn-event counts are not multiplied by subscription joins.
-- [ ] Check slicers and all displayed values against SQL outputs.
+- [ ] Check slicers and displayed values against SQL outputs.
 - [ ] Capture a screenshot of the actual report and save it as `Screenshots/dashboard.png`.
