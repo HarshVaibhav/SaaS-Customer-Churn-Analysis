@@ -22,6 +22,7 @@ The project uses five related datasets: Accounts, Subscriptions, Feature Usage, 
 | Path | Purpose |
 |---|---|
 | SQL/ | SQL analysis and business queries |
+| Dataset/ | Source CSV datasets used in the analysis |
 | PowerBI/SaaS_Churn_Dashboard.pbix | Power BI report |
 | PowerBI/README.md | Report/model notes |
 | Documentation/Business_Insights.md | Business findings |
